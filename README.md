@@ -26,3 +26,18 @@ Future Deaths : ([total deaths]/[total case] * ([serious, critical]+[active case
 * $10 : Deaths/1M pop
 * $11 : Reported 1st case
 
+# 使い方
+# Usage
+
+```bash
+sh COVID19_Monitor.sh
+```
+# Why didn't you make one liner?
+# なぜワンライナーにしなかった？
+It was easy because the HTML of Coronavirus Update (Live) from COVID-19 Virus Outbreak Worldometer was not monolithic.  
+それは簡単なことで、Coronavirus Update (Live) from COVID-19 Virus Outbreak WorldometerのHTMLが一枚岩ではいかない構成だったからです。  
+
+# Such is life.
+
+
+
