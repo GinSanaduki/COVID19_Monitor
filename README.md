@@ -4,15 +4,15 @@
 
 # COVID19_Monitor
 Output Console Country/Other, Mortality, Future Deaths Every 5 seconds. 
-data source : Coronavirus Update (Live) from COVID-19 Virus Outbreak Worldometer
+data source : Coronavirus Update (Live) from COVID-19 Virus Outbreak Worldometer  
 https://www.worldometers.info/coronavirus/  
 
-Works on Android(on Termux, UserLAnd, and other...) / Windows(WSL, Windows Subsystem for Linux) / UNIX(Unix-like, as *nix. Example Linux, AIX, HP-UX...) / Mac OS X.
+Works on Android(on Termux, UserLAnd, and other...) / Windows(WSL, Windows Subsystem for Linux) / UNIX(Unix-like, as *nix. Example Linux, AIX, HP-UX...) / Mac OS X.  
 
-The curl commands need to be installed.
+The curl commands need to be installed.  
 
-Mortality : ([total recovered]/[total case])
-Future Deaths : ([total deaths]/[total case] * ([serious, critical]+[active case]))
+Mortality : ([total recovered]/[total case])  
+Future Deaths : ([total deaths]/[total case] * ([serious, critical]+[active case]))  
 
 * $1 : Country,Other
 * $2 : Total Cases
