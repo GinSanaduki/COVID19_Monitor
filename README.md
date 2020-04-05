@@ -39,5 +39,6 @@ It was easy because the HTML of Coronavirus Update (Live) from COVID-19 Virus Ou
 
 # Such is life.
 
-
+# 関連リポジトリ
+https://github.com/tokyo-metropolitan-gov/covid19
 
