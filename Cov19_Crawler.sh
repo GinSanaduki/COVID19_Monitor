@@ -26,12 +26,66 @@ echo "新型コロナウイルス感染症対策サイトのHTML取得中・・�
 curl --silent https://stopcovid19.metro.tokyo.lg.jp/ > $Cov19_Fname
 
 # 検査陽性者の状況
+echo "検査陽性者の状況のCSV変換開始・・・"
+cat $Cov19_Fname | \
+awk '{gsub(/\s/,""); print;}' | \
+awk '/^検査陽性者の状況$/,/^陽性患者数$/' | \
+awk '{gsub("><",">\n<"); print;}' | \
+awk '/^陽性者数$/,/<divclass="DataView-Description">/' | \
+fgrep -v -e 'span>' -e 'div>' -e 'li>' -e 'ul>' -e '<!' -e 'class' | \
+fgrep "<strong>" | \
+sed -e 's/,//g'| \
+awk '{gsub("<strong>",""); gsub("</strong>",""); print;}' | \
+awk '{if(NR % 6){ORS=",";} else {ORS="\n";} print;}' | \
+awk 'BEGIN{print "陽性者数（累計）,入院中,軽症・中等症,重症,死亡,退院（療養期間経過を含む）";}{print;}' > "検査陽性者の状況_"$FileNameHash".csv"
+echo "検査陽性者の状況のCSV変換完了"
 
 # 陽性患者数
+echo "陽性患者数のCSV変換開始・・・"
+cat $Cov19_Fname | \
+awk '{gsub(/\s/,""); print;}' | \
+awk '/^陽性患者数$/,/^陽性患者数（区市町村別）$/' | \
+awk '{gsub("><",">\n<"); print;}' | \
+awk '/^<th>.*?<\/th>$/{print;}/^<tdclass="text-end">.*?<\/td>$/{print;}' | \
+awk '{if(NR % 3){ORS="\t";} else {ORS="\n";} print;}' | \
+awk '{gsub("<th>",""); gsub("</th>",""); gsub(/<tdclass="text-start">/,""); gsub(/<tdclass="text-end">/,""); gsub("</td>",""); gsub(",",""); gsub("/","\t"); print;}' | \
+awk 'BEGIN{FS = "\t";}($1 == "都外"){print ",,"$1","$2; print ",,"$3","$4; next;}{print;}' | \
+awk 'BEGIN{print "月,日,陽性患者数（日別）,陽性患者数（累計）";}{gsub("\t",","); print;}' > "陽性患者数_"$FileNameHash".csv"
+echo "陽性患者数のCSV変換完了"
 
 # 陽性患者の属性
+echo "陽性患者の属性のCSV変換開始・・・"
+# curlで取れんかった・・・w
+cat $Cov19_Fname | \
+awk '{gsub(/\s/,""); print;}' | \
+awk '/^陽性患者数のグラフ$/,/^陽性患者数（区市町村別）$/' | \
+awk '{gsub("><",">\n<"); print;}' | \
+fgrep "<ahref=\"https" | \
+sed -e 's/target.*//g' -e 's/"//g' -e 's/<ahref=//g' | \
+awk '{print "curl --silent "$0;}' | \
+sh | \
+awk '{gsub(/\s/,""); print;}' | \
+fgrep "<ahref=\"https" | \
+fgrep ".csv" | \
+sed -e 's/class.*//g' -e 's/"//g' -e 's/<ahref=//g' | \
+awk '{print "curl --silent "$0;}' | \
+sh | \
+awk '{gsub("\r\n","\n"); print;}' > "陽性患者の属性_オープンデータ版_"$FileNameHash".csv"
+
+echo "陽性患者の属性のCSV変換完了"
 
 # 陽性患者数（区市町村別）
+echo "陽性患者数（区市町村別）のCSV変換開始・・・"
+cat $Cov19_Fname | \
+awk '{gsub(/\s/,""); print;}' | \
+awk '/^陽性患者数（区市町村別）$/,/^検査実施状況$/' | \
+awk '{gsub("><",">\n<"); print;}' | \
+awk '/^<th>.*?<\/th>$/{print;}/^<tdclass="text-start">.*?<\/td>$/{print;}/^<tdclass="text-end">.*?<\/td>$/{print;}' | \
+awk '{if(NR % 4){ORS="\t";} else {ORS="\n";} print;}' | \
+awk '{gsub("<th>",""); gsub("</th>",""); gsub(/<tdclass="text-start">/,""); gsub(/<tdclass="text-end">/,""); gsub("</td>",""); gsub(",",""); gsub("/","\t"); print;}' | \
+awk 'BEGIN{FS = "\t";}($1 == "都外"){print ",,"$1","$2; print ",,"$3","$4; next;}{print;}' | \
+awk 'BEGIN{print "地域,ふりがな,区市町村,陽性患者数";}{gsub("\t",","); print;}' > "陽性患者数（区市町村別）_"$FileNameHash".csv"
+echo "陽性患者数（区市町村別）のCSV変換完了"
 
 # 検査実施状況
 echo "検査実施状況のCSV変換開始・・・"
