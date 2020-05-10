@@ -227,6 +227,15 @@ awk '{gsub("<th>",""); gsub("</th>",""); gsub(/<tdclass="text-end">/,""); gsub("
 awk 'BEGIN{print "開始月,開始日,終了月,終了日,第一庁舎計,第二庁舎計,議事堂計";}{gsub("\t",","); print;}' > "都庁来庁者数の推移_"$FileNameHash".csv"
 echo "都庁来庁者数の推移のCSV変換完了"
 
+# 陽性率
+echo "陽性率の計算開始・・・"
+cat "検査実施人数_"$FileNameHash".csv" "陽性患者数_"$FileNameHash".csv" | \
+awk 'BEGIN{FS = ","; Mode = 0; Cnt = 1;}($0 == "月,日,陽性患者数（日別）,陽性患者数（累計）"){Mode++; next;}(Mode == 0){Col01[Cnt] = $1; Col02[Cnt] = $2; Col03[Cnt] = $3; Col04[Cnt] = $4; Cnt++; next;}{for(i in Col01){if(Col01[i] == $1 && Col02[i] == $2){print Col01[i]","Col02[i]","Col03[i]","Col04[i]","$3","$4; break;}}}' | \
+# 月,日,陽性患者数（日別）,陽性患者数（累計）,検査実施人数（日別）,検査実施人数（累計）
+awk 'BEGIN{FS = ","}{Negative_ByDay= $5 - $3; Negative_Cumulative = $6 - $4; Positive_Rate = $3 / $5 * 100; print $0","Negative_ByDay","Negative_Cumulative","Positive_Rate;}' | \
+awk 'BEGIN{print "月,日,陽性患者数（日別）,陽性患者数（累計）,検査実施人数（日別）,検査実施人数（累計）,陰性患者数（日別）,陰性患者数（累計）,陽性率(the last six digits)";}{print;}' > "陽性率_"$FileNameHash".csv"
+echo "陽性率の計算完了"
+
 echo "That's all, folks..."
 exit 0
 
