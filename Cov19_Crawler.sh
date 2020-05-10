@@ -137,6 +137,25 @@ awk '/^<th>.*?<\/th>$/{print;}/^<tdclass="text-end">.*?<\/td>$/{print;}' | \
 awk '{if(NR % 3){ORS="\t";} else {ORS="\n";} print;}' | \
 awk '{gsub("<th>",""); gsub("</th>",""); gsub(/<tdclass="text-end">/,""); gsub("</td>",""); gsub(",",""); gsub("/","\t"); print;}' | \
 awk 'BEGIN{print "月,日,新型コロナコールセンター相談件数 （日別）,新型コロナコールセンター相談件数（累計）";}{gsub("\t",","); print;}' > "新型コロナコールセンター相談件数_"$FileNameHash".csv"
+
+# オープンデータ取得
+cat $Cov19_Fname | \
+cat Covid19_e2877ffe2432843569f947bbdba03dbf37facf9082f5682edc2ace1c5f1d61a.txt | \
+awk '{gsub(/\s/,""); print;}' | \
+awk '/^新型コロナコールセンター相談件数のグラフ$/,/^新型コロナ受診相談窓口相談件数$/' | \
+awk '{gsub("><",">\n<"); print;}' | \
+fgrep "<ahref=\"https" | \
+sed -e 's/target.*//g' -e 's/"//g' -e 's/<ahref=//g' | \
+awk '{print "curl --silent "$0;}' | \
+sh | \
+awk '{gsub(/\s/,""); print;}' | \
+fgrep "<ahref=\"https" | \
+fgrep ".csv" | \
+sed -e 's/class.*//g' -e 's/"//g' -e 's/<ahref=//g' | \
+awk '{print "curl --silent "$0;}' | \
+sh | \
+awk '{gsub("\r\n","\n"); print;}' > "新型コロナコールセンター相談件数_オープンデータ版_"$FileNameHash".csv"
+
 echo "新型コロナコールセンター相談件数のCSV変換完了"
 
 # 新型コロナ受診相談窓口相談件数
@@ -149,6 +168,24 @@ awk '/^<th>.*?<\/th>$/{print;}/^<tdclass="text-end">.*?<\/td>$/{print;}' | \
 awk '{if(NR % 3){ORS="\t";} else {ORS="\n";} print;}' | \
 awk '{gsub("<th>",""); gsub("</th>",""); gsub(/<tdclass="text-end">/,""); gsub("</td>",""); gsub(",",""); gsub("/","\t"); print;}' | \
 awk 'BEGIN{print "月,日,新型コロナ受診相談窓口相談件数（日別）,新型コロナ受診相談窓口相談件数（累計）";}{gsub("\t",","); print;}' > "新型コロナ受診相談窓口相談件数_"$FileNameHash".csv"
+
+# オープンデータ取得
+cat $Cov19_Fname | \
+awk '{gsub(/\s/,""); print;}' | \
+awk '/^新型コロナ受診相談窓口相談件数のグラフ$/,/^都営地下鉄の利用者数の推移$/' | \
+awk '{gsub("><",">\n<"); print;}' | \
+fgrep "<ahref=\"https" | \
+sed -e 's/target.*//g' -e 's/"//g' -e 's/<ahref=//g' | \
+awk '{print "curl --silent "$0;}' | \
+sh | \
+awk '{gsub(/\s/,""); print;}' | \
+fgrep "<ahref=\"https" | \
+fgrep ".csv" | \
+sed -e 's/class.*//g' -e 's/"//g' -e 's/<ahref=//g' | \
+awk '{print "curl --silent "$0;}' | \
+sh | \
+awk '{gsub("\r\n","\n"); print;}' > "新型コロナ受診相談窓口相談件数_オープンデータ版_"$FileNameHash".csv"
+
 echo "新型コロナ受診相談窓口相談件数のCSV変換完了"
 
 # 都営地下鉄の利用者数の推移
@@ -161,6 +198,21 @@ awk '/^<th>.*?<\/th>$/{print;}/^<tdclass="text-end">.*?<\/td>$/{print;}' | \
 awk '{if(NR % 4){ORS="\t";} else {ORS="\n";} print;}' | \
 awk '{gsub("<th>",""); gsub("</th>",""); gsub(/<tdclass="text-end">/,""); gsub("</td>",""); gsub(",",""); gsub("~",","); gsub("/","\t"); print;}' | \
 awk 'BEGIN{print "開始月,開始日,終了月,終了日,6時30分から7時30分の間の相対値,7時30分から9時30分の間の相対値,9時30分から10時30分の間の相対値";}{gsub("\t",","); print;}' > "都営地下鉄の利用者数の推移_"$FileNameHash".csv"
+
+# 鉄道利用者数の推移（新宿、東京、渋谷、各駅エリア）[PDF] 取得
+# PDFはtesseractでOCRしたほうがいい？
+cat Covid19_e2877ffe2432843569f947bbdba03dbf37facf9082f5682edc2ace1c5f1d61a.txt | \
+awk '{gsub(/\s/,""); print;}' | \
+awk '/^都営地下鉄の利用者数の推移のグラフ/,/^鉄道利用者数の推移（新宿、東京、渋谷、各駅エリア）\[PDF\]$/' | \
+awk '{gsub("><",">\n<"); print;}' | \
+fgrep "<ahref=\"https" | \
+sed -e 's/target.*//g' -e 's/"//g' -e 's/<ahref=//g' | \
+awk '{print "curl --silent "$0;}' | \
+sh > "鉄道利用者数の推移（新宿、東京、渋谷、各駅エリア）_オープンデータ版_"$FileNameHash".pdf"
+
+# 主要駅の改札通過人数の推移（東京、新宿、渋谷、池袋ほか）[内閣官房HP]（ページ下部） 取得
+# 内閣府のは、ダッシュボードを引き込んでいるので、トップページをみてもしょうがない、というか、jsで自動生成しているみたいだから、seleniumが要るねえ・・・。
+
 echo "都営地下鉄の利用者数の推移のCSV変換完了"
 
 # 都庁来庁者数の推移
